@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PhotoBoardComponent } from './photo-board.component';
 import { Photo } from './interfaces/photo';
-import { SimpleChange, SimpleChanges } from '@angular/core';
+import { Component, SimpleChange, SimpleChanges, ViewChild } from '@angular/core';
 
 function buildPhotoList(): Photo[]{
   const photos: Photo[] = [];
@@ -17,37 +17,45 @@ function buildPhotoList(): Photo[]{
   return photos;
 }
 
-describe(PhotoBoardComponent.name, () => {
-  let component: PhotoBoardComponent;
-  let fixture: ComponentFixture<PhotoBoardComponent>;
+describe(PhotoBoardComponent.name + ' outros', () => {
+  let component: PhotoBoardTestComponent;
+  let fixture: ComponentFixture<PhotoBoardTestComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      declarations: [PhotoBoardTestComponent],
       imports: [PhotoBoardModule],
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PhotoBoardComponent);
+    fixture = TestBed.createComponent(PhotoBoardTestComponent);
     component = fixture.componentInstance;
   });
 
   it('should display rows and columns when (@Input photos) has value', () => {
     component.photos = buildPhotoList();
     fixture.detectChanges();
-    const change: SimpleChanges = {
-      photos: new SimpleChange([], component.photos, true)
-    };
-    component.ngOnChanges(change);
-    expect(component.rows.length)
+    expect(component.board.rows.length)
       .withContext('Number of rows: ')
       .toBe(2);
-    expect(component.rows[0].length)
+    expect(component.board.rows[0].length)
       .withContext('Number of columns from the first row')
       .toBe(4);
-    expect(component.rows[0].length)
+    expect(component.board.rows[0].length)
       .withContext('Number of columns from the second row')
       .toBe(4);
   });
 });
+
+@Component({
+  template: `
+  <app-photo-board
+  [photos]="photos"></app-photo-board>
+  `
+})
+class PhotoBoardTestComponent{
+  @ViewChild(PhotoBoardComponent) public board: PhotoBoardComponent;
+  public photos: Photo[] = [];
+}
